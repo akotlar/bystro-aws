@@ -10,12 +10,16 @@ git pull origin master
 cd ~/go/src/github.com/akotlar/bystro-vcf/
 git fetch
 git pull origin master
+go install
 cd ../bystro-snp
 git fetch
 git pull origin master
+go install
 cd ../bystro-utils
 git fetch
 git pull origin master
+cd parse
+go install
 
 cd $cdir
 

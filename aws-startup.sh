@@ -4,9 +4,15 @@ line=$(lsblk | grep nvme | wc -l);
 
 cd ~/seq-lmdb
 git pull origin master
+regex="([a-zA-Z0-9]+)\.clean\.yml"
+for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp "$name" config/"$test".yml && yaml w -i $_ database_dir /mnt/annotator/ && yaml w -i config/"$test".yml temp_dir /mnt/annotator/tmp; fi; done;
 
 # Update go packages;
 # TODO: combine go packages
+cd ~/go/src/github.com/akotlar/bystro-utils/parse
+git fetch
+git pull origin master
+go install
 cd ~/go/src/github.com/akotlar/bystro-vcf/
 git fetch
 git pull origin master
@@ -14,11 +20,6 @@ go install
 cd ../bystro-snp
 git fetch
 git pull origin master
-go install
-cd ../bystro-utils
-git fetch
-git pull origin master
-cd parse
 go install
 
 cd $cdir

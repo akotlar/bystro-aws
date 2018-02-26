@@ -9,7 +9,7 @@ sudo yum install openssl-devel -y;
 # Not strictly necessary, useful however for much of what we do
 sudo yum install git-all -y;
 # pigz for Bystro, used to speed up decompression primarily
-sudo yum install pigz -y;;
+sudo yum install pigz -y;
 sudo yum install unzip -y;
 sudo yum install wget -y;
 # For tests involving querying ucsc directly
@@ -21,12 +21,12 @@ sudo yum install mysql-devel -y;
 sudo yum install bzip2  -y;
 sudo yum install patch -y;
 
-rm -rf bystro
+rm -rf bystro;
 git clone git@github.com:akotlar/bystro.git;
 cd bystro;
 ./install-rpm.sh;
 
-regex="([a-zA-Z0-9]+)\.clean\.yml"
+regex="([a-zA-Z0-9]+)\.clean\.yml";
 for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp "$name" config/"$test".yml && yaml w -i $_ database_dir /mnt/annotator/ && yaml w -i config/"$test".yml temp_dir /mnt/annotator/tmp; fi; done;
 
 cd $cdir;
@@ -44,20 +44,20 @@ else
 fi
 
 #https://stackoverflow.com/questions/3557037/appending-a-line-to-a-file-only-if-it-does-not-already-exist
-mountTarget='LABEL=ANNOTATOR       /mnt/annotator   ext4    defaults,nofail        0       2'
-fileTarget='/etc/fstab'
-grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fileTarget"
+mountTarget='LABEL=ANNOTATOR       /mnt/annotator   ext4    defaults,nofail        0       2';
+fileTarget='/etc/fstab';
+grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fileTarget";
 
 mountTarget='fs-8987f3c0.efs.us-east-1.amazonaws.com:/ /seqant nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0'
 grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fileTarget"
 
 # Copy latest database files, and untar them
-declare -a dbs=$(aws s3 ls s3://bystro-db/ | grep -oP "\S+.tar.gz")
+declare -a dbs=$(aws s3 ls s3://bystro-db/ | grep -oP "\S+.tar.gz");
 
-sudo chown -R ec2-user /mnt/annotator
+sudo chown -R ec2-user /mnt/annotator;
 cd /mnt/annotator;
 
-sudo yum install mailx -y
+sudo yum install mailx -y;
 
 # run in parallel
 # could also just use the fact that amazon downloads as multipart && uses many connections

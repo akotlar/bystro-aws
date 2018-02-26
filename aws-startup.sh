@@ -25,7 +25,7 @@ rm -rf bystro;
 git clone git://github.com/akotlar/bystro.git
 
 cd bystro;
-./install-rpm.sh;
+sudo ./install-rpm.sh;
 
 regex="([a-zA-Z0-9]+)\.clean\.yml";
 for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp "$name" config/"$test".yml && yaml w -i $_ database_dir /mnt/annotator/ && yaml w -i config/"$test".yml temp_dir /mnt/annotator/tmp; fi; done;

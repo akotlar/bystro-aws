@@ -22,7 +22,8 @@ sudo yum install bzip2  -y;
 sudo yum install patch -y;
 
 rm -rf bystro;
-git clone git@github.com:akotlar/bystro.git;
+git clone git://github.com/akotlar/bystro.git
+
 cd bystro;
 ./install-rpm.sh;
 

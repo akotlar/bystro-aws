@@ -35,7 +35,12 @@ cd $cdir;
 sudo mkdir -p /mnt/annotator;
 sudo chown ec2-user -R /mnt/annotator;
 
-if (($line >= 2)); then 
+#TODO: make this generalized
+if (($line == 4)); then
+  sudo mdadm --create --verbose /dev/md0 --level=0 --name=ANNOTATOR --raid-devices=4 /dev/nvme0n1 /dev/nvme1n1 /dev/nvme2n1 /dev/nvme3n1;
+  sudo mkfs.ext4 -L ANNOTATOR /dev/md0;
+  sudo mount LABEL=ANNOTATOR /mnt/annotator;
+elif (($line == 2));  then
   sudo mdadm --create --verbose /dev/md0 --level=0 --name=ANNOTATOR --raid-devices=2 /dev/nvme0n1 /dev/nvme1n1;
   sudo mkfs.ext4 -L ANNOTATOR /dev/md0;
   sudo mount LABEL=ANNOTATOR /mnt/annotator;

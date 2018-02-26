@@ -2,25 +2,31 @@
 cdir=$(pwd)
 line=$(lsblk | grep nvme | wc -l);
 
+sudo yum install gcc -y
+sudo yum install cpan -y
+sudo yum install openssl -y
+sudo yum install openssl-devel -y
+# Not strictly necessary, useful however for much of what we do
+sudo yum install git-all -y
+# pigz for Bystro, used to speed up decompression primarily
+sudo yum install pigz -y
+sudo yum install unzip -y
+sudo yum install wget -y
+# For tests involving querying ucsc directly
+sudo yum install mysql-devel -y
+
+# for perlbrew, in case you want to install a different perl version
+#https://www.digitalocean.com/community/tutorials/how-to-install-perlbrew-and-manage-multiple-versions-of-perl-5-on-centos-7
+# centos 7 doesn't include bzip2
+sudo yum install bzip2  -y
+sudo yum install patch -y
+
 cd ~/seq-lmdb
-git pull origin master
+git pull origin
+./install-rpm.sh
+
 regex="([a-zA-Z0-9]+)\.clean\.yml"
 for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp "$name" config/"$test".yml && yaml w -i $_ database_dir /mnt/annotator/ && yaml w -i config/"$test".yml temp_dir /mnt/annotator/tmp; fi; done;
-
-# Update go packages;
-# TODO: combine go packages
-cd ~/go/src/github.com/akotlar/bystro-utils/parse
-git fetch
-git pull origin master
-go install
-cd ~/go/src/github.com/akotlar/bystro-vcf/
-git fetch
-git pull origin master
-go install
-cd ../bystro-snp
-git fetch
-git pull origin master
-go install
 
 cd $cdir
 

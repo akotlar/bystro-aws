@@ -1,6 +1,7 @@
 #!/bin/sh
 # Could configure in some other dir
-HOME_DIR=/home/ec2-user;
+su - ec2-user;
+HOME_DIR=~;
 USER=ec2-user;
 cd $HOME_DIR;
 

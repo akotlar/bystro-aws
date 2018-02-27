@@ -1,5 +1,8 @@
 #!/bin/sh
-cdir=$(pwd);
+# Could configure in some other dir
+cdir=/home/ec2-user/;
+cd cdir;
+
 line=$(lsblk | grep nvme | wc -l);
 
 sudo yum install gcc -y -q;

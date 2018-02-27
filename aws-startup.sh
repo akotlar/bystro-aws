@@ -1,7 +1,8 @@
 #!/bin/sh
 # Could configure in some other dir
-cdir=/home/ec2-user/;
-cd cdir;
+HOME_DIR=/home/ec2-user;
+USER=ec2-user;
+cd $HOME_DIR;
 
 line=$(lsblk | grep nvme | wc -l);
 
@@ -24,19 +25,21 @@ sudo yum install mysql-devel -y -q;
 sudo yum install bzip2  -y -q;
 sudo yum install patch -y -q;
 
+
+cd $HOME_DIR;
 rm -rf bystro;
 git clone git://github.com/akotlar/bystro.git
 
 cd bystro;
-sudo ./install-rpm.sh;
+sudo ./install-rpm.sh $HOME_DIR;
 
 regex="([a-zA-Z0-9]+)\.clean\.yml";
 for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp "$name" config/"$test".yml && yaml w -i $_ database_dir /mnt/annotator/ && yaml w -i config/"$test".yml temp_dir /mnt/annotator/tmp; fi; done;
 
-cd $cdir;
+cd $HOME_DIR;
 
 sudo mkdir -p /mnt/annotator;
-sudo chown ec2-user -R /mnt/annotator;
+sudo chown $USER -R /mnt/annotator;
 
 #TODO: make this generalized
 if (($line == 4)); then
@@ -63,7 +66,7 @@ grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fil
 # Copy latest database files, and untar them
 declare -a dbs=$(aws s3 ls s3://bystro-db/ | grep -oP "\S+.tar.gz");
 
-sudo chown -R ec2-user /mnt/annotator;
+sudo chown -R $USER /mnt/annotator;
 cd /mnt/annotator;
 
 sudo yum install mailx -y;
@@ -95,7 +98,7 @@ for pid in $pids; do
     fi
 done
 
-cd $cdir;
+cd $HOME_DIR;
 
 
 # TODO: increase ulimit

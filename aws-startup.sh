@@ -1,38 +1,19 @@
 #!/bin/sh
 # Could configure in some other dir
-su - ec2-user;
 HOME_DIR=~;
 USER=ec2-user;
 cd $HOME_DIR;
 
 line=$(lsblk | grep nvme | wc -l);
 
-sudo yum install gcc -y -q;
-sudo yum install cpan -y -q;
-sudo yum install openssl -y -q;
-sudo yum install openssl-devel -y -q;
-# Not strictly necessary, useful however for much of what we do
 sudo yum install git-all -y -q;
-# pigz for Bystro, used to speed up decompression primarily
-sudo yum install pigz -y -q;
-sudo yum install unzip -y -q;
-sudo yum install wget -y -q;
-# For tests involving querying ucsc directly
-sudo yum install mysql-devel -y -q;
-
-# for perlbrew, in case you want to install a different perl version
-#https://www.digitalocean.com/community/tutorials/how-to-install-perlbrew-and-manage-multiple-versions-of-perl-5-on-centos-7
-# centos 7 doesn't include bzip2
-sudo yum install bzip2  -y -q;
-sudo yum install patch -y -q;
-
 
 cd $HOME_DIR;
 rm -rf bystro;
 git clone git://github.com/akotlar/bystro.git
 
 cd bystro;
-sudo ./install-rpm.sh $HOME_DIR;
+source ./install-rpm.sh $HOME_DIR;
 
 regex="([a-zA-Z0-9]+)\.clean\.yml";
 for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp "$name" config/"$test".yml && yaml w -i $_ database_dir /mnt/annotator/ && yaml w -i config/"$test".yml temp_dir /mnt/annotator/tmp; fi; done;

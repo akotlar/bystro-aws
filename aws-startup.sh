@@ -20,6 +20,40 @@ go get gopkg.in/mikefarah/yq.v2
 regex="([a-zA-Z0-9]+)\.clean\.yml";
 for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp -f "$name" config/"$test".yml && yq w -i $_ database_dir /mnt/annotator/ && yq w -i config/"$test".yml temp_dir /mnt/annotator/tmp/; fi; done;
 
+mkdir -p elastic-config
+echo "connection:
+  # 2000MB max content size
+  max_content_length: 2097152000
+  request_timeout: 300000
+  gzip: 1
+  nodes:
+    - "172.31.33.29:9200"
+    - "172.31.33.224:9200"
+    - "172.31.40.7:9200"" > elastic-config/config.yml
+
+mkdir -p seq-beanstalk-workers
+echo "beanstalkd:
+  host: 172.31.56.119
+  port: 11300
+  tubes:
+    annotation:
+      submission: annotation
+      events: annotation_events
+    saveFromQuery:
+      submission: saveFromQuery
+      events: saveFromQuery_events
+    index:
+      submission: index
+      events: index_events
+    filters:
+      submission: filters
+      events: filters_events
+  events:
+    started : started
+    completed : completed
+    failed : failed
+    progress : progress" > seq-beanstalk-workers/beanstalk1.yml
+    
 cd $HOME_DIR;
 
 sudo mkdir -p /mnt/annotator/tmp;
@@ -44,8 +78,12 @@ mountTarget='LABEL=ANNOTATOR       /mnt/annotator   ext4    defaults,nofail     
 fileTarget='/etc/fstab';
 grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fileTarget";
 
-mountTarget='fs-8987f3c0.efs.us-east-1.amazonaws.com:/ /seqant nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0'
-grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fileTarget"
+sudo yum install -y amazon-efs-utils;
+sudo mkdir /seqant;
+sudo mount -t efs fs-8987f3c0:/ /seqant;
+mountTarget='fs-8987f3c0
+//mountTarget='fs-8987f3c0.efs.us-east-1.amazonaws.com:/ /seqant nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0'
+//grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fileTarget"
 
 # Copy latest database files, and untar them
 declare -a dbs=$(aws s3 ls s3://bystro-db/ | grep -oP "\S+.tar.gz");

@@ -18,7 +18,7 @@ source ./install-rpm.sh $HOME_DIR;
 go get gopkg.in/mikefarah/yq.v2
 
 regex="([a-zA-Z0-9]+)\.clean\.yml";
-for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp -f "$name" config/"$test".yml && yq w -i $_ database_dir /mnt/annotator/ && yq w -i config/"$test".yml temp_dir /mnt/annotator/tmp/; fi; done;
+for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp -f "$name" config/"$test".yml && yq w -i $_ database_dir /mnt/annotator/"$test"/index && yq w -i config/"$test".yml temp_dir /mnt/annotator/tmp/; fi; done;
 
 mkdir -p elastic-config
 echo "connection:

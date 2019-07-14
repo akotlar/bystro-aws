@@ -52,7 +52,7 @@ echo "beanstalkd:
     started : started
     completed : completed
     failed : failed
-    progress : progress" > seq-beanstalk-workers/beanstalk1.yml
+    progress : progress" > seq-beanstalk-workers/beanstalk1.yaml
     
 cd $HOME_DIR;
 

@@ -15,12 +15,14 @@ git clone git://github.com/akotlar/bystro.git
 cd bystro;
 source ./install-rpm.sh $HOME_DIR;
 
+go get gopkg.in/mikefarah/yq.v2
+
 regex="([a-zA-Z0-9]+)\.clean\.yml";
-for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp "$name" config/"$test".yml && yaml w -i $_ database_dir /mnt/annotator/ && yaml w -i config/"$test".yml temp_dir /mnt/annotator/tmp; fi; done;
+for name in config/*.clean.yml; do if [[ $name =~ $regex ]]; then test="${BASH_REMATCH[1]}"; \cp -f "$name" config/"$test".yml && yq w -i $_ database_dir /mnt/annotator/ && yq w -i config/"$test".yml temp_dir /mnt/annotator/tmp/; fi; done;
 
 cd $HOME_DIR;
 
-sudo mkdir -p /mnt/annotator;
+sudo mkdir -p /mnt/annotator/tmp;
 sudo chown $USER -R /mnt/annotator;
 
 #TODO: make this generalized

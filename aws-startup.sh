@@ -122,5 +122,8 @@ done
 
 cd $HOME_DIR;
 
+cd bystro;
+pm2 start startup.yml;
+
 
 # TODO: increase ulimit

@@ -27,9 +27,7 @@ echo "connection:
   request_timeout: 300000
   gzip: 1
   nodes:
-    - "172.31.33.29:9200"
-    - "172.31.33.224:9200"
-    - "172.31.40.7:9200"" > elastic-config/config.yml
+    - "172.31.23.196:9200"" > elastic-config/config.yml
 
 mkdir -p seq-beanstalk-workers
 echo "beanstalkd:
@@ -63,28 +61,27 @@ sudo chown $USER -R /mnt/annotator;
 if (($line == 4)); then
   sudo mdadm --create --verbose /dev/md0 --level=0 --name=ANNOTATOR --raid-devices=4 /dev/nvme0n1 /dev/nvme1n1 /dev/nvme2n1 /dev/nvme3n1;
   sudo mkfs.ext4 -L ANNOTATOR /dev/md0;
-  sudo mount LABEL=ANNOTATOR /mnt/annotator;
 elif (($line == 2));  then
   sudo mdadm --create --verbose /dev/md0 --level=0 --name=ANNOTATOR --raid-devices=2 /dev/nvme0n1 /dev/nvme1n1;
   sudo mkfs.ext4 -L ANNOTATOR /dev/md0;
-  sudo mount LABEL=ANNOTATOR /mnt/annotator;
 else 
   sudo mkfs.ext4 -L ANNOTATOR /dev/nvme0n1;
-  sudo mount LABEL=ANNOTATOR /mnt/annotator;
 fi
+
+fileTarget='/etc/fstab';
 
 #https://stackoverflow.com/questions/3557037/appending-a-line-to-a-file-only-if-it-does-not-already-exist
 mountTarget='LABEL=ANNOTATOR       /mnt/annotator   ext4    defaults,nofail        0       2';
-fileTarget='/etc/fstab';
 grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fileTarget";
 
 sudo yum install -y amazon-efs-utils;
-sudo mkdir /seqant;
-sudo mount -t efs fs-8987f3c0:/ /seqant;
-mountTarget='fs-8987f3c0
-//mountTarget='fs-8987f3c0.efs.us-east-1.amazonaws.com:/ /seqant nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0'
-//grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fileTarget"
+sudo mkdir -p /seqant;
 
+#mountTarget='fs-8987f3c0.efs.us-east-1.amazonaws.com:/ /seqant nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0'
+mountTarget='fs-8987f3c0:/       /seqant   efs    tls,_netdev        0       0'
+grep -qF "$mountTarget" "$fileTarget" || echo "$mountTarget" | sudo tee -a "$fileTarget"
+
+sudo mount -a
 # Copy latest database files, and untar them
 declare -a dbs=$(aws s3 ls s3://bystro-db/ | grep -oP "\S+.tar.gz");
 

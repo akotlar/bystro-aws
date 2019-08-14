@@ -118,8 +118,10 @@ for pid in $pids; do
 done
 
 cd $HOME_DIR;
+source .bash_profile;
 
 cd bystro;
+
 pm2 start startup.yml;
 
 

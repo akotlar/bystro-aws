@@ -117,10 +117,8 @@ for pid in $pids; do
     fi
 done
 
-cd $HOME_DIR;
-source .bash_profile;
-
-cd bystro;
+source $HOME_DIR/.bash_profile;
+cd $HOME_DIR/bystro;
 
 pm2 start startup.yml;
 
